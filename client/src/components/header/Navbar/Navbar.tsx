@@ -191,7 +191,7 @@ const Navbar = () => {
         className={`w-full top-0 z-50 transition-all ease-in-out duration-300 border-b py-2 border-[#262626]/5 ${isSticky ? "fixed bg-white shadow-md py-2" : "relative"
           }`}
       >
-        <div className="w-full max-w-full md:max-w-6xl lg:max-w-6xl mx-auto py-2 px-4">
+        <div className="w-full max-w-full md:max-w-7xl lg:max-w-7xl mx-auto py-2 px-4">
           <div className="flex items-center justify-between">
 
             <div>
@@ -212,10 +212,10 @@ const Navbar = () => {
                 const isActive = pathname === menu.link || (menu.link === "#" && pathname.startsWith("/properties"));
                 const hasDropdown = menu.dropdownItems && menu.dropdownItems.length > 0;
                 return (
-                  <div key={menu.id} className="relative group hover:bg-primary/10 rounded px-2 py-2">
+                  <div key={menu.id} className="relative group hover:bg-primary/10 rounded px-1.5 py-2">
                     <Link href={menu.link}>
                       <li
-                        className={`list-none text-base font-medium cursor-pointer relative flex items-center ${poppins.className
+                        className={`list-none text-sm font-medium cursor-pointer relative flex items-center ${poppins.className
                           } ${isActive
                             ? "text-primary-500 text-blue-600 after:absolute  after:right-0 after:bottom-0  after:bg-primary-700"
                             : "text-gray-700"
@@ -314,7 +314,7 @@ const Navbar = () => {
             </div>
 
             {/* Desktop Auth Section */}
-            <div className="hidden lg:flex items-center justify-center lg:gap-2 font-medium text-[12px]">
+            <div className="hidden lg:flex items-center justify-center lg:gap-2.5 font-medium text-[12px]">
               {isAuthenticated && (user as any)?.isVerified ? (
                 <>
                   {/* <Dropdown
@@ -360,55 +360,50 @@ const Navbar = () => {
                     </div>
                   </Dropdown>
 
-                  <button
-                    className="ml-2 px-5 py-2 bg-gradient-to-r from-primary to-primary text-white rounded-full font-semibold shadow-md transition-transform duration-300 hover:scale-105 animate-pulse border-2 border-primary cursor-pointer hidden md:inline-flex"
-                    onClick={() => {
-                      if ((user as any)?.role === "host") {
-                        window.location.href = "/host-dashboard";
-                      } else {
-                        setShowLoginModal(true);
-                        setIsHost(true);
-                      }
-                    }}
-
+                  <Link
+                    href="/sell-rent-property"
+                    className="ml-2 px-3 py-1.5 bg-gradient-to-r from-primary to-primary text-white rounded-full text-xs font-semibold shadow-md transition-transform duration-300 hover:scale-105 animate-pulse border-2 border-primary cursor-pointer hidden md:inline-flex items-center whitespace-nowrap"
                   >
-                    <span className="inline-block animate-bounce mr-2">🏠</span>{" "}
-                    Sell/Rent your Property
-                  </button>
+                    <span className="inline-block animate-bounce mr-1.5">🏠</span>
+                    Sell/Rent Property
+                  </Link>
                 </>
               ) : (
                 <>
                   <button
                     onClick={() => setShowLoginModal(true)}
-                    className="flex cursor-pointer items-center gap-1 border border-primary px-4 py-1 rounded"
+                    className="flex cursor-pointer items-center gap-1 border border-primary px-3 py-1 rounded text-sm"
                   >
                     <span className="p-1 rounded-full bg-primary text-white">
-                      <HiOutlineUser />
+                      <HiOutlineUser className="text-xs" />
                     </span>
                     <span>Login</span>
                   </button>
 
                   <button
                     onClick={() => setShowModal(true)}
-                    className="px-6 py-2 cursor-pointer bg-primary rounded text-white hidden md:block"
+                    className="px-4 py-1.5 cursor-pointer bg-primary rounded text-white text-sm hidden md:block"
                   >
                     Sign Up
                   </button>
 
-                  <button
-                    className="ml-2 px-5 py-2 bg-primary text-white rounded-full font-semibold shadow-md transition-transform duration-300 hover:scale-105  border-1 border-primary cursor-pointer hidden md:inline-flex"
-                    onClick={() => {
-                      setShowLoginModal(true);
-                      setIsHost(true);
-                    }
-
-                    }
+                  <Link
+                    href="/sell-rent-property"
+                    className="ml-2 px-3 py-1.5 bg-gradient-to-r from-primary to-primary text-white rounded-full text-xs font-semibold shadow-md transition-transform duration-300 hover:scale-105 animate-pulse border-2 border-primary cursor-pointer hidden md:inline-flex items-center whitespace-nowrap"
                   >
-                    <span className="inline-block animate-bounce mr-2">🏠</span>{" "}
-                    Sell/Rent your Property
-                  </button>
+                    <span className="inline-block animate-bounce mr-1.5">🏠</span>
+                    Sell/Rent Property
+                  </Link>
                 </>
               )}
+              <a
+                href="tel:+8801904108303"
+                className="hidden md:flex px-3 py-1.5 text-center justify-center border border-primary text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 items-center gap-1.5 whitespace-nowrap"
+              >
+                <span className="text-center md:inline hidden font-semibold text-xs">
+                  Helpline: +8801904108303
+                </span>
+              </a>
             </div>
 
             {/* Mobile Menu Button and User Avatar */}
@@ -734,17 +729,14 @@ const Navbar = () => {
                     Sign Up
                   </button>
 
-                  <button
-                    onClick={() => {
-                      setShowLoginModal(true);
-                      setIsMobileMenuOpen(false);
-                      setIsHost(true);
-                    }}
-                    className="w-full px-4 py-1 bg-gradient-to-r from-primary to-primary text-white rounded-lg font-medium shadow-md transition-transform duration-300 hover:scale-105"
+                  <Link
+                    href="/sell-rent-property"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full px-4 py-1 bg-gradient-to-r from-primary to-primary text-white rounded-lg font-medium shadow-md transition-transform duration-300 hover:scale-105 flex items-center justify-center gap-2"
                   >
-                    <span className="mr-2">🏠</span>
+                    <span className="inline-block animate-bounce">🏠</span>
                     Sell/Rent your Property
-                  </button>
+                  </Link>
                 </div>
               )}
             </div>

@@ -11,6 +11,7 @@ import Link from "next/link";
 import PaymentModal from "@/components/modals/PaymentModal";
 import renderClientForm from "./ClientForm";
 import Success from "./success";
+import useAuth from "@/hooks/useAuth";
 
 const { RangePicker } = DatePicker;
 
@@ -46,8 +47,11 @@ const Booking = ({
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [pendingBookingData, setPendingBookingData] = useState<any>(null);
   const [agreed, setAgreed] = useState(false);
+  const [appointmentDateString, setAppointmentDateString] = useState<string>("");
+  const [appointmentTimeString, setAppointmentTimeString] = useState<string>("");
 
   const [localUser, setLocalUser] = useState(user);
+  const { isAuthenticated } = useAuth();
   const [client, setClient] = useState({
     name: "",
     email: "",
@@ -75,7 +79,17 @@ const Booking = ({
 
   useEffect(() => {
     setLocalUser(user);
-  }, [user]);
+
+    // Auto-fill client data if user is logged in
+    if (isAuthenticated && user) {
+      setClient(prev => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+        phone: user.phone || prev.phone,
+      }));
+    }
+  }, [user, isAuthenticated]);
 
   useEffect(() => {
     const fetchExistingBookings = async () => {
@@ -414,10 +428,55 @@ const Booking = ({
           </div>
         )}
 
-      
+      {/* Appointment Date Section - Moved above client form for SELL properties */}
+      {(property?.listingType === "SELL") &&
+        property?.rentDurationType !== "FLEXIBLE" && (
+          <div className="mb-4">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-4">
+              <h4 className="text-md font-semibold text-gray-800 mb-3">
+                Select Appointment Date
+              </h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Select appointment date *
+                  </label>
+                  <input
+                    type="date"
+                    value={appointmentDateString}
+                    onChange={(e) => {
+                      setAppointmentDateString(e.target.value);
+                      if (e.target.value) {
+                        setAppointmentDate(dayjs(e.target.value));
+                      }
+                    }}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary bg-white"
+                    required
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Select a date for your appointment request</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
-      {renderClientForm(property, client, setClient, agreed, setAgreed)}
-      {(property?.listingType === "RENT" || property?.listingType === "SELL") &&
+      {renderClientForm(
+        property,
+        client,
+        setClient,
+        agreed,
+        setAgreed,
+        localUser,
+        isAuthenticated,
+        appointmentDateString,
+        setAppointmentDateString,
+        appointmentTimeString,
+        setAppointmentTimeString
+      )}
+
+      {/* Appointment Date for RENT (non-flexible) - Keep at bottom */}
+      {property?.listingType === "RENT" &&
         property?.rentDurationType !== "FLEXIBLE" && (
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">

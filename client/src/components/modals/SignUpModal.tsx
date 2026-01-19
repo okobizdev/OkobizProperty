@@ -36,13 +36,21 @@ const SignupModal = ({ open, onClose }: SignupModalProps) => {
   >({
     mutationFn: processSignup,
     onSuccess: async (data) => {
-      messageApi.success("Signup successfully!");
+      messageApi.success({
+        content: `Registration successful! Please check your email to verify your account.`,
+        duration: 5,
+      });
       await router.push(`/email-verification?email=${data?.data?.email}&role=${role}`);
       form.resetFields();
+      setAgreed(false);
       onClose();
     },
-    onError: () => {
-      messageApi.error("Email already Exist");
+    onError: (error: any) => {
+      if (error?.response?.data?.message?.includes("email")) {
+        messageApi.error("This email is already registered. Please login or use a different email.");
+      } else {
+        messageApi.error(error?.response?.data?.message || "Registration failed. Please try again.");
+      }
     },
   });
 
@@ -58,15 +66,17 @@ const SignupModal = ({ open, onClose }: SignupModalProps) => {
       {contextHolder}
       <Modal
         title={
-          <div className="pb-4 border-b border-gray-200 text-start text-lg font-semibold">
-            Welcome to Okobiz Property
+          <div className="pb-4 border-b border-gray-200 text-start">
+            <h2 className="text-xl font-bold text-gray-800">Create Your Account</h2>
+            <p className="text-sm text-gray-500 mt-1">Join Okobiz Property today</p>
           </div>
         }
         open={open}
         onCancel={onClose}
         footer={null}
         centered
-        destroyOnHidden
+        destroyOnClose
+        width={500}
       >
         <div className="space-y-4 py-2">
           <div className="w-full flex justify-center items-center gap-4 mb-6">
@@ -116,33 +126,42 @@ const SignupModal = ({ open, onClose }: SignupModalProps) => {
 
             <Form.Item
               name="name"
-              rules={[{ required: true, message: "Please enter your name" }]}
+              rules={[
+                { required: true, message: "Please enter your name" },
+                { min: 2, message: "Name must be at least 2 characters" },
+                { max: 50, message: "Name must not exceed 50 characters" },
+                { pattern: /^[a-zA-Z\s]+$/, message: "Name should only contain letters" }
+              ]}
             >
               <Input placeholder="Full Name" size="large" />
             </Form.Item>
 
             <Form.Item
               name="phone"
-              rules={[{ required: true, message: "Please enter your phone number" }]}
+              rules={[
+                { required: true, message: "Please enter your phone number" },
+                { pattern: /^01[3-9]\d{8}$/, message: "Please enter a valid Bangladeshi phone number (e.g., 01XXXXXXXXX)" }
+              ]}
             >
-              <Input placeholder="Phone Number" size="large" />
+              <Input placeholder="Phone Number (01XXXXXXXXX)" size="large" maxLength={11} />
             </Form.Item>
 
             <Form.Item
               name="email"
-              rules={[{ required: true, message: "Please enter your email" }]}
+              rules={[
+                { required: true, message: "Please enter your email" },
+                { type: "email", message: "Please enter a valid email address" }
+              ]}
             >
-              <Input placeholder="Email" size="large" />
+              <Input placeholder="Email Address" size="large" type="email" />
             </Form.Item>
 
             <Form.Item
               name="password"
               rules={[
                 { required: true, message: "Please enter a password" },
-                {
-                  min: 8,
-                  message: "Password must be at least 8 characters long",
-                },
+                { min: 8, message: "Password must be at least 8 characters long" },
+                { pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, message: "Password must include uppercase, lowercase, and number" }
               ]}
               hasFeedback
             >

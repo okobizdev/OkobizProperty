@@ -5,6 +5,7 @@ import { RxHome } from "react-icons/rx";
 
 import Link from "next/link";
 import { RiBuilding2Line } from "react-icons/ri";
+import { MdAccountCircle } from "react-icons/md";
 
 
 const DownFooter = () => {
@@ -65,6 +66,15 @@ const DownFooter = () => {
               <RiBuilding2Line className="text-xl" />
             </p>
             <p className="text-[12px]">Buy/Sell</p>
+          </div>
+        </Link>
+
+        <Link href="/sell-rent-property">
+          <div className="flex flex-col items-center justify-between capitalize text-[#262626]/80 hover:text-primary duration-300">
+            <p>
+              <MdAccountCircle className="text-xl" />
+            </p>
+            <p className="text-[12px]">Owners Login</p>
           </div>
         </Link>
 

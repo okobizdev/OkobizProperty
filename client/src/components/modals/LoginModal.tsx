@@ -1,6 +1,6 @@
 "use client";
 
-import { Input, Modal, Button, message } from "antd";
+import { Input, Modal, Button, message, Form } from "antd";
 import { useState } from "react";
 import SignupModal from "./SignUpModal";
 import { AuthServices } from "@/services/auth/auth.service";
@@ -27,10 +27,10 @@ const initialForm = {
 const LoginModal = ({ open, onClose, isHost }: LoginModalProps) => {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState(initialForm);
   const [messageApi, contextHolder] = message.useMessage();
   const { login } = useAuth();
   const [role, setRole] = useState<"host" | "guest">(isHost ? "host" : "guest");
+  const [form] = Form.useForm();
 
   useState(() => {
     if (isHost) {
@@ -53,7 +53,7 @@ const LoginModal = ({ open, onClose, isHost }: LoginModalProps) => {
       const accessToken = data?.accessToken;
 
       if (!accessToken) {
-        messageApi.error("No access token received.");
+        messageApi.error("Authentication failed. Please try again.");
         return;
       }
 
@@ -63,50 +63,46 @@ const LoginModal = ({ open, onClose, isHost }: LoginModalProps) => {
 
         login({ accessToken });
 
-        messageApi.success(data.message || "Login successful!");
-        onClose();
-        setFormData(initialForm);
+        messageApi.success({
+          content: "Login successful! Redirecting...",
+          duration: 3,
+        });
 
-        if (userRole === "host") {
-          router.push("/host-dashboard");
-        }
+        form.resetFields();
+        onClose();
+
+        setTimeout(() => {
+          if (userRole === "host") {
+            router.push("/host-dashboard");
+          }
+        }, 500);
       } catch (error) {
-        console.log(error);
-        console.error("Invalid token", error);
-        messageApi.error("Invalid token.");
+        console.error("Token decode error:", error);
+        messageApi.error("Authentication error. Please try again.");
       }
     },
 
     onError: (error: any) => {
       if (error.status === 422) {
-        messageApi.error("Your account is not verified, please check your email and verify with OTP.");
-        router.replace(`/email-verification?email=${formData.email}&role=${role}`);
-        onClose();
-        return;
+        messageApi.warning({
+          content: "Your account is not verified. Please check your email and verify with OTP.",
+          duration: 5,
+        });
+        const email = form.getFieldValue("email");
+        setTimeout(() => {
+          router.replace(`/email-verification?email=${email}&role=${role}`);
+          onClose();
+        }, 1500);
       } else if (error.status === 401) {
-        messageApi.error("Invalid credentials.");
-        return;
+        messageApi.error("Invalid email or password. Please try again.");
       } else {
-        messageApi.error(error.message || "Login failed. Please try again.");
-        return;
+        messageApi.error(error?.response?.data?.message || "Login failed. Please try again.");
       }
     },
   });
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = () => {
-    const { email, password } = formData;
-    if (!email || !password) {
-      return messageApi.warning("Please fill in both fields.");
-    }
-
-    // Ensure role is set to 'host' if isHost is true
+  const handleSubmit = (values: { email: string; password: string }) => {
     const finalRole = isHost ? "host" : role;
-
-    loginUser({ email, password, role: finalRole });
+    loginUser({ ...values, role: finalRole });
   };
 
   return (
@@ -115,14 +111,17 @@ const LoginModal = ({ open, onClose, isHost }: LoginModalProps) => {
 
       <Modal
         title={
-          <div className="pb-4 border-b border-gray-200 text-center text-lg font-semibold">
-            Welcome to Okobiz Property
+          <div className="pb-4 border-b border-gray-200 text-start">
+            <h2 className="text-xl font-bold text-gray-800">Welcome Back</h2>
+            <p className="text-sm text-gray-500 mt-1">Login to your Okobiz Property account</p>
           </div>
         }
         open={open}
         onCancel={onClose}
         footer={null}
         centered
+        destroyOnClose
+        width={500}
       >
         <div className="space-y-4">
           <div className="w-full flex justify-center items-center gap-4 mb-2">
@@ -162,40 +161,54 @@ const LoginModal = ({ open, onClose, isHost }: LoginModalProps) => {
               );
             })}
           </div>
-          <div className="py-3">
-            <Input
-              name="email"
-              placeholder=" Your email address "
-              value={formData.email}
-              onChange={handleChange}
-              size="large"
-            />
-          </div>
-          <div className="py-3">
-            <Input.Password
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              size="large"
-            />
-          </div>
-          <Button
-            block
-            size="large"
-            type="primary"
-            className="!bg-primary mt-4"
-            onClick={handleSubmit}
-            loading={isPending}
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSubmit}
+            className="space-y-4"
           >
-            Continue as {isHost ? "Property Owner" : hostandGuest.find(t => t.name === role)?.display}
-          </Button>
+            <Form.Item
+              name="email"
+              rules={[
+                { required: true, message: "Please enter your email" },
+                { type: "email", message: "Please enter a valid email address" }
+              ]}
+            >
+              <Input placeholder="Email Address" size="large" type="email" />
+            </Form.Item>
+
+            <Form.Item
+              name="password"
+              rules={[
+                { required: true, message: "Please enter your password" },
+                { min: 8, message: "Password must be at least 8 characters" }
+              ]}
+            >
+              <Input.Password placeholder="Password" size="large" />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                block
+                size="large"
+                type="primary"
+                htmlType="submit"
+                className="!bg-primary"
+                loading={isPending}
+              >
+                Continue as {isHost ? "Property Owner" : hostandGuest.find(t => t.name === role)?.display}
+              </Button>
+            </Form.Item>
+          </Form>
+
           <Button
             type="link"
+            block
             onClick={() => {
               router.push("/forgot-password");
               onClose();
             }}
+            className="text-center"
           >
             Forgot Password?
           </Button>
