@@ -1,0 +1,114 @@
+[
+    {
+      "_id": "1",
+      "title": "Cozy 3-bed entire apartment at Bashundhara.",
+      "description": "A peaceful villa overlooking the ocean.",
+      "coverImage": "https://i.ibb.co.com/7JpYcXc7/rent1.jpg",
+      "amenities": [
+        { "_id": "a1", "amenitiesLabel": "3 bedroom", "amenitiesImage":"https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" },
+        { "_id": "a2", "amenitiesLabel": "2 bed", "amenitiesImage": "https://i.ibb.co.com/W4QFk2jK/single-bed.png" },
+        { "_id": "a2", "amenitiesLabel": "5 guests", "amenitiesImage": "https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" }
+      ],
+     
+      "price": 4550,
+      "location": "Bashundhara, Dhaka"
+    },
+    {
+      "_id": "2",
+      "title": "Budget-friendly studio Flat.",
+      "description": "Convenient downtown location with skyline views.",
+      "coverImage": "https://i.ibb.co.com/5xBv2NJC/rent2.png",
+      "amenities": [
+        { "_id": "a3", "amenitiesLabel": "3 bedroom", "amenitiesImage":"https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" },
+        { "_id": "a4", "amenitiesLabel": "2 bed", "amenitiesImage": "https://i.ibb.co.com/W4QFk2jK/single-bed.png" },
+        { "_id": "a42",  "amenitiesLabel": "5 guests", "amenitiesImage": "https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" }
+      ],
+     
+      "price": 2080,
+      "location": "House 2B, Road 2, Bashundhara Residential Area, North Agrabad, Agrabad, Chattogram"
+    },
+    {
+      "_id": "3",
+      "title": "Couple Room with attached washroom in Aftabnagar",
+      "description": "Escape to nature in this cozy cabin.",
+      "coverImage": "https://i.ibb.co.com/BKjk30jg/rent3.jpg",
+      "amenities": [
+        { "_id": "a31", "amenitiesLabel": "3 bedroom", "amenitiesImage":"https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" },
+        { "_id": "a42", "amenitiesLabel": "2 bed", "amenitiesImage": "https://i.ibb.co.com/W4QFk2jK/single-bed.png" },
+        { "_id": "a423",  "amenitiesLabel": "5 guests", "amenitiesImage": "https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" }
+      ],
+     
+      "price": 1300,
+      "location": "Aspen, CO"
+    },
+    {
+      "_id": "4",
+      "title": "AC Couple Room w/ Attached Bath – Aftabnagar",
+      "description": "Fully furnished with all modern comforts.",
+      "coverImage": "https://i.ibb.co.com/twhhpFPb/rent4.jpg",
+      "amenities": [
+        { "_id": "a311", "amenitiesLabel": "3 bedroom", "amenitiesImage":"https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" },
+        { "_id": "a421", "amenitiesLabel": "2 bed", "amenitiesImage": "https://i.ibb.co.com/W4QFk2jK/single-bed.png" },
+        { "_id": "a4231",  "amenitiesLabel": "5 guests", "amenitiesImage": "https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" }
+      ],
+     
+      "price": 3000,
+      "location": "Aftabnagar, Dhaka"
+    },
+    {
+      "_id": "5",
+      "title": "AC Couple Room w/ Attached Bath – Aftabnagar",
+      "description": "Relax in a quiet rural area.",
+      "coverImage": "https://i.ibb.co.com/whdqv06y/rent5.jpg",
+      "amenities": [
+        { "_id": "a3111", "amenitiesLabel": "3 bedroom", "amenitiesImage":"https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" },
+        { "_id": "a4211", "amenitiesLabel": "2 bed", "amenitiesImage": "https://i.ibb.co.com/W4QFk2jK/single-bed.png" },
+        { "_id": "a42311",  "amenitiesLabel": "5 guests", "amenitiesImage": "https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" }
+      ],
+     
+      "price": 6520,
+      "location": "Dhanmondi Lake Road, Dhaka"
+    },
+    {
+      "_id": "6",
+      "title": "Amazing room with drawing",
+      "description": "Steps away from the ski slopes.",
+      "coverImage": "https://i.ibb.co.com/hFsd46Pk/rent6.jpg",
+      "amenities": [
+        { "_id": "a31112", "amenitiesLabel": "3 bedroom  and swimming pool", "amenitiesImage":"https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" },
+        { "_id": "a42112", "amenitiesLabel": "2 bed and 1 table", "amenitiesImage": "https://i.ibb.co.com/W4QFk2jK/single-bed.png" },
+        { "_id": "a423112",  "amenitiesLabel": "5 guests and 1 adult", "amenitiesImage": "https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" }
+      ],
+      
+      "price": 5000,
+      "location": "Aftabnagar, Dhaka"
+    },
+    {
+      "_id": "7",
+      "title": "Couple Room Attach bath West Dhanmondi,Rayerbazar",
+      "description": "Immerse yourself in lush greenery.",
+      "coverImage": "https://i.ibb.co.com/mxnnT0G/rent7.jpg",
+      "amenities": [
+        { "_id": "a311123", "amenitiesLabel": "3 bedroom", "amenitiesImage":"https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" },
+        { "_id": "a421123", "amenitiesLabel": "2 bed", "amenitiesImage": "https://i.ibb.co.com/W4QFk2jK/single-bed.png" },
+        { "_id": "a4231123",  "amenitiesLabel": "5 guests", "amenitiesImage": "https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" }
+      ],
+     
+      "price": 8500,
+      "location": "Dhanmondi Lake Road, Dhaka"
+    },
+    {
+      "_id": "8",
+      "title": "Couple friendly environment.",
+      "description": "Charming and spacious with vintage details.",
+      "coverImage": "https://i.ibb.co.com/zHnywzPv/rent8.jpg",
+      "amenities": [
+        { "_id": "a3111234", "amenitiesLabel": "3 bedroom", "amenitiesImage":"https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" },
+        { "_id": "a4211234", "amenitiesLabel": "2 bed", "amenitiesImage": "https://i.ibb.co.com/W4QFk2jK/single-bed.png" },
+        { "_id": "a42311234",  "amenitiesLabel": "5 guests", "amenitiesImage": "https://i.ibb.co.com/6JL4RnN1/hotel-bed.png" }
+      ],
+      "price": 5000,
+      "location": "Boston, MA"
+    }
+  ]
+  

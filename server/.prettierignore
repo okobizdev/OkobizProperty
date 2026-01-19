@@ -1,0 +1,34 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+out/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.*
+
+# Dependency lock files (optional)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Coverage reports
+coverage/
+
+# Compiled TypeScript
+*.tsbuildinfo
+
+# System files
+.DS_Store
+
+# VS Code settings
+.vscode/
+
+# Public assets (optional)
+public/

@@ -1,0 +1,40 @@
+@import "tailwindcss";
+.categoryTable th.ant-table-cell {
+  width: 40%;
+}
+/* @layer components {
+  .container {
+    @apply py-32 2xl:px-32 xl:px-28 lg:px-20 md:px-12 px-8 mx-auto;
+  }
+} */
+
+/* ReactQuill spacing fix */
+.ant-modal .ql-container {
+    min-height: 200px;
+}
+
+.ant-modal .ql-editor {
+    min-height: 200px;
+}
+
+/* Preserve line breaks and spacing in editor */
+.ql-editor p {
+    margin-bottom: 1em;
+}
+
+.ql-editor br {
+    display: block;
+    content: "";
+}
+
+/* Ensure proper spacing between elements */
+.ql-editor h4 {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+.ql-editor ul,
+.ql-editor ol {
+    margin: 1em 0;
+    padding-left: 1.5em;
+}

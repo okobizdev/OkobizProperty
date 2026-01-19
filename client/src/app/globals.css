@@ -1,0 +1,167 @@
+@import "tailwindcss";
+
+@layer base {
+  .Container {
+    @apply 2xl:px-60 xl:px-30 lg:px-10 md:px-4 px-4;
+  }
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary-color: #08396d;
+  /*  primary color */
+  --secondary-color: #202020;
+  /*  secondary color */
+  --thirdly-color: #a0a2a7;
+  /*  secondary color */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary-color);
+  --color-secondary: var(--secondary-color);
+  --color-thirdly: var(--thirdly-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  /* :root {
+    --background: #fff;
+    --foreground: #fff;
+    --primary-color: #F15927; 
+    --secondary-color: #202020; 
+    --thirdly-color: #c8c9cc; 
+  } */
+}
+
+/* body {
+  background: var(--background);
+  color: var(--foreground);
+  
+} */
+
+.custom-pagination .swiper-pagination-bullet {
+  @apply w-4 h-4 bg-transparent border rounded-full opacity-60 transition-all mt-20;
+}
+
+.custom-pagination .swiper-pagination-bullet-active {
+  @apply bg-primary border border-primary opacity-100 scale-110;
+}
+
+.custom-pagination2 .swiper-pagination-bullet {
+  @apply w-4 h-4 bg-transparent border rounded-full opacity-60 transition-all mt-20;
+}
+
+.custom-pagination2 .swiper-pagination-bullet-active {
+  @apply bg-primary border border-primary opacity-100 scale-110;
+}
+
+
+.custom-pagination3 .swiper-pagination-bullet {
+  @apply w-4 h-4 bg-transparent border rounded-full opacity-60 transition-all mt-20;
+}
+
+.custom-pagination3 .swiper-pagination-bullet-active {
+  @apply bg-primary border border-primary opacity-100 scale-110;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
+
+/* Ensure Quill lists display properly */
+.ql-editor ul,
+.ql-editor ol {
+  padding-left: 1em !important;
+}
+
+.ql-editor ul li {
+  list-style-type: disc !important;
+  display: list-item !important;
+}
+
+.ql-editor ol li {
+  list-style-type: decimal !important;
+  display: list-item !important;
+}
+
+/* Remove Quill's custom bullets */
+.ql-editor li::before {
+  display: none !important;
+}
+
+/* For displaying saved content */
+[data-list="bullet"] {
+  list-style-type: disc !important;
+  display: list-item !important;
+  margin-left: 1em !important;
+}
+
+.ant-tooltip {
+  z-index: 99999 !important;
+}
+
+.ql-ui {
+  display: none !important;
+}
+
+/* ReactQuill fixes for Ant Design Form in admin panel */
+.ant-form-item-control-input-content .ql-container {
+  font-size: 14px;
+}
+
+.ant-form-item-control-input-content .quill {
+  margin-bottom: 50px;
+}
+
+.ql-editor {
+  min-height: 200px;
+}
+
+/* Fix bullet display in editor */
+.ql-editor ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+}
+
+.ql-editor ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+}
+
+.property-description ul {
+  list-style-type: disc;
+  padding-left: 2em;
+  margin: 1em 0;
+}
+
+.property-description ol {
+  list-style-type: decimal;
+  padding-left: 2em;
+  margin: 1em 0;
+}
+
+.property-description li {
+  margin: 0.5em 0;
+}
+
+.property-description p {
+  margin: 1em 0;
+}
+
+.property-description h4 {
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin: 1em 0 0.5em 0;
+}

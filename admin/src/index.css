@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+/* Override Ant Design global primary color */
+:root {
+  --ant-primary-color: #2563eb; /* Tailwind blue-600 */
+  --ant-primary-color-hover: #1d4ed8; /* Tailwind blue-700 */
+  --ant-primary-color-active: #1e40af; /* Tailwind blue-800 */
+  --ant-primary-color-outline: rgba(37, 99, 235, 0.2);
+}
+
+/* Buttons */
+.ant-btn-primary {
+  background-color: var(--ant-primary-color) !important;
+  border-color: var(--ant-primary-color) !important;
+}
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  background-color: var(--ant-primary-color-hover) !important;
+  border-color: var(--ant-primary-color-hover) !important;
+}
+
+/* Links */
+a {
+  color: var(--ant-primary-color);
+}
+a:hover {
+  color: var(--ant-primary-color-hover);
+}
+
+/* Selected menu items */
+.ant-menu-item-selected {
+  background-color: var(--ant-primary-color) !important;
+  color: #fff !important;
+}
+.ant-menu-item-selected:hover {
+  background-color: var(--ant-primary-color-hover) !important;
+  color: #fff !important;
+}
+
+/* Switch, Checkbox, Radio checked states */
+.ant-switch-checked,
+.ant-checkbox-checked .ant-checkbox-inner,
+.ant-radio-checked .ant-radio-inner {
+  background-color: var(--ant-primary-color) !important;
+  border-color: var(--ant-primary-color) !important;
+}
+/* ReactQuill spacing fix */
+.ant-modal .ql-container {
+    min-height: 200px;
+}
+
+.ant-modal .ql-editor {
+    min-height: 200px;
+}
+
+/* Ensure Quill lists display properly */
+.ql-editor ul,
+.ql-editor ol {
+  padding-left: 1.5em !important;
+}
+
+.ql-editor ul li {
+  list-style-type: disc !important;
+  display: list-item !important;
+}
+
+.ql-editor ol li {
+  list-style-type: decimal !important;
+  display: list-item !important;
+}
+
+/* Remove Quill's custom bullets */
+.ql-editor li::before {
+  display: none !important;
+}
+
+/* For displaying saved content */
+[data-list="bullet"] {
+  list-style-type: disc !important;
+  display: list-item !important;
+  margin-left: 1.5em !important;
+}
+
+.ql-ui {
+  display: none !important;
+}
+
+/* ReactQuill fixes for Ant Design Form in admin panel */
+.ant-form-item-control-input-content .ql-container {
+    font-size: 14px;
+}
+
+.ant-form-item-control-input-content .quill {
+    margin-bottom: 50px;
+}
+
+.ql-editor {
+  min-height: 200px;
+}
+
+/* Fix bullet display in editor */
+.ql-editor ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+}
+
+.ql-editor ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+}
+
+.property-description ul {
+  list-style-type: disc;
+  padding-left: 2em;
+  margin: 1em 0;
+}
+
+.property-description ol {
+  list-style-type: decimal;
+  padding-left: 2em;
+  margin: 1em 0;
+}
+
+.property-description li {
+  margin: 0.5em 0;
+}
+
+.property-description p {
+  margin: 1em 0;
+}
+
+.property-description h4 {
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin: 1em 0 0.5em 0;
+}
