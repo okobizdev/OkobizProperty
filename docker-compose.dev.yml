@@ -1,0 +1,54 @@
+# Development docker-compose override
+# Use: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: '3.9'
+
+services:
+  
+  mongodb:
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+  
+  server:
+    build:
+      context: ./server
+      target: builder  # Use builder stage for hot reload
+    environment:
+      NODE_ENV: development
+      PORT: 5001
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./server/src:/app/src:ro
+      - ./server/dist:/app/dist
+    command: npm run dev
+  
+  client:
+    build:
+      context: ./client
+      target: builder
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+    volumes:
+      - ./client/src:/app/src:ro
+      - ./client/public:/app/public:ro
+    command: npm run dev
+  
+  admin:
+    build:
+      context: ./admin
+      target: builder
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./admin/src:/app/src:ro
+      - ./admin/public:/app/public:ro
+    command: npm run dev
+  
+  nginx:
+    ports:
+      - "8080:80"  # Use 8080 for dev to avoid conflicts

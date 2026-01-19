@@ -1,0 +1,182 @@
+version: '3.9'
+
+# ============================================
+# NETWORKS
+# ============================================
+networks:
+  okobiz-network:
+    driver: bridge
+    name: okobiz-property-network
+
+# ============================================
+# VOLUMES
+# ============================================
+volumes:
+  mongodb-data:
+    name: okobiz-mongodb-data
+  server-uploads:
+    name: okobiz-server-uploads
+  server-logs:
+    name: okobiz-server-logs
+
+# ============================================
+# SERVICES
+# ============================================
+services:
+  
+  # ------------------------------------------
+  # MongoDB Database (Local for Development)
+  # ------------------------------------------
+  mongodb:
+    image: mongo:7.0
+    container_name: okobiz-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-admin123}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-properties}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+      - mongodb-data:/data/configdb
+    networks:
+      - okobiz-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  # ------------------------------------------
+  # Backend API Server (Node.js + TypeScript)
+  # ------------------------------------------
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: akashokobiz/server:latest
+    container_name: okobiz-server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 5000
+      MONGODB_URI: ${MONGODB_URI:-mongodb://admin:admin123@mongodb:27017/properties?authSource=admin}
+      REDIS_URI: ${REDIS_URI}
+      JWT_ACCESS_TOKEN_SECRET_KEY: ${JWT_ACCESS_TOKEN_SECRET_KEY}
+      JWT_REFRESH_TOKEN_SECRET_KEY: ${JWT_REFRESH_TOKEN_SECRET_KEY}
+      CLIENT_BASE_URL: ${CLIENT_BASE_URL:-http://nginx}
+      SERVER_BASE_URL: ${SERVER_BASE_URL:-http://nginx/api/v1}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_NAME: ${ADMIN_NAME}
+    ports:
+      - "5000:5000"
+    volumes:
+      - server-uploads:/app/uploads
+      - server-logs:/app/logs
+      - ./server/public:/app/public
+    networks:
+      - okobiz-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5000/api/v1/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ------------------------------------------
+  # Client Application (Next.js)
+  # ------------------------------------------
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:5000/api/v1}
+        NEXT_PUBLIC_API_ADMIN_URL: ${NEXT_PUBLIC_API_ADMIN_URL:-http://localhost:3001}
+    image: akashokobiz/client:latest
+    container_name: okobiz-client
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3000
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://nginx/api/v1}
+      NEXT_PUBLIC_API_ADMIN_URL: ${NEXT_PUBLIC_API_ADMIN_URL:-http://nginx/admin}
+    ports:
+      - "3000:3000"
+    networks:
+      - okobiz-network
+    depends_on:
+      server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ------------------------------------------
+  # Admin Panel (React.js + Vite)
+  # ------------------------------------------
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:5000/api/v1}
+    image: akashokobiz/admin:latest
+    container_name: okobiz-admin
+    restart: unless-stopped
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://nginx/api/v1}
+    ports:
+      - "3001:3001"
+    networks:
+      - okobiz-network
+    depends_on:
+      server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # ------------------------------------------
+  # NGINX Reverse Proxy
+  # ------------------------------------------
+  nginx:
+    image: nginx:alpine
+    container_name: okobiz-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - server-uploads:/usr/share/nginx/uploads:ro
+    networks:
+      - okobiz-network
+    depends_on:
+      - client
+      - admin
+      - server
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

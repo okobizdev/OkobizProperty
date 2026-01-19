@@ -1,0 +1,188 @@
+name: Deploy to VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deployment environment"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - production
+          - staging
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+      - ".github/**"
+      - "!.github/workflows/deploy.yml"
+
+env:
+  IMAGE_PREFIX: akashokobiz
+
+jobs:
+  # ============================================
+  # Deploy to VPS
+  # ============================================
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+
+      - name: Add VPS to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create deployment directory
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p ~/okobiz-property"
+
+      - name: Copy docker-compose and nginx config
+        run: |
+          scp docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/okobiz-property/
+          scp -r nginx ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/okobiz-property/
+
+      - name: Create .env file on VPS
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd ~/okobiz-property
+            
+            # Create .env file with secrets
+            cat > .env << 'ENVEOF'
+          NODE_ENV=production
+
+          # MongoDB
+          MONGO_ROOT_USERNAME=${{ secrets.MONGO_ROOT_USERNAME }}
+          MONGO_ROOT_PASSWORD=${{ secrets.MONGO_ROOT_PASSWORD }}
+          MONGO_DATABASE=properties
+          MONGODB_URI=${{ secrets.MONGODB_URI }}
+
+          # Redis
+          REDIS_URI=${{ secrets.REDIS_URI }}
+
+          # JWT
+          JWT_ACCESS_TOKEN_SECRET_KEY=${{ secrets.JWT_ACCESS_TOKEN_SECRET_KEY }}
+          JWT_REFRESH_TOKEN_SECRET_KEY=${{ secrets.JWT_REFRESH_TOKEN_SECRET_KEY }}
+
+          # URLs
+          CLIENT_BASE_URL=${{ secrets.CLIENT_BASE_URL }}
+          SERVER_BASE_URL=${{ secrets.SERVER_BASE_URL }}
+
+          # SMTP
+          SMTP_HOST=${{ secrets.SMTP_HOST }}
+          SMTP_PORT=${{ secrets.SMTP_PORT }}
+          SMTP_USER=${{ secrets.SMTP_USER }}
+          SMTP_PASS=${{ secrets.SMTP_PASS }}
+
+          # Admin
+          ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+          ADMIN_NAME=${{ secrets.ADMIN_NAME }}
+
+          # Client env vars
+          NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+          NEXT_PUBLIC_API_ADMIN_URL=${{ secrets.NEXT_PUBLIC_API_ADMIN_URL }}
+
+          # Admin env vars
+          VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
+          ENVEOF
+          EOF
+
+      - name: Pull latest Docker images
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd ~/okobiz-property
+            docker pull ${{ env.IMAGE_PREFIX }}/client:latest
+            docker pull ${{ env.IMAGE_PREFIX }}/admin:latest
+            docker pull ${{ env.IMAGE_PREFIX }}/server:latest
+          EOF
+
+      - name: Stop existing containers
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd ~/okobiz-property
+            docker-compose down --remove-orphans || true
+          EOF
+
+      - name: Start new containers
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd ~/okobiz-property
+            docker-compose up -d
+          EOF
+
+      - name: Wait for services to be healthy
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd ~/okobiz-property
+            
+            echo "Waiting for services to be healthy..."
+            sleep 30
+            
+            # Check service health
+            docker-compose ps
+            
+            # Verify containers are running
+            if [ $(docker-compose ps -q | wc -l) -eq 0 ]; then
+              echo "❌ No containers are running!"
+              docker-compose logs
+              exit 1
+            fi
+          EOF
+
+      - name: Clean up old Docker images
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            docker image prune -af --filter "until=48h"
+          EOF
+
+      - name: Deployment summary
+        run: |
+          echo "✅ Deployment completed successfully!"
+          echo "🚀 Application is now running on: ${{ secrets.VPS_HOST }}"
+          echo "📦 Services deployed:"
+          echo "   - Client (Next.js)"
+          echo "   - Admin (React + Vite)"
+          echo "   - Server (Node.js API)"
+          echo "   - NGINX Reverse Proxy"
+          echo "   - MongoDB"
+
+  # ============================================
+  # Health Check Post-Deployment
+  # ============================================
+  health-check:
+    name: Health Check
+    runs-on: ubuntu-latest
+    needs: deploy
+
+    steps:
+      - name: Check application health
+        run: |
+          sleep 10
+
+          # Check main site
+          echo "Checking client application..."
+          curl -f http://${{ secrets.VPS_HOST }}/ || exit 1
+
+          # Check API health
+          echo "Checking API health..."
+          curl -f http://${{ secrets.VPS_HOST }}/api/v1/health || exit 1
+
+          # Check admin panel
+          echo "Checking admin panel..."
+          curl -f http://${{ secrets.VPS_HOST }}/admin/ || exit 1
+
+          echo "✅ All health checks passed!"
